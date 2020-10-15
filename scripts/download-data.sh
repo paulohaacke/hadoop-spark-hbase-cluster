@@ -10,7 +10,7 @@ urls=( "http://www.portaltransparencia.gov.br/download-de-dados/bolsa-familia-pa
 mkdir -p ~/data
 mkdir -p ~/data/uploaded
 hdfs dfs -mkdir /input || true
-for url in $urls
+for url in ${urls[*]}
 do
 	cd ~/data &&
 		wget -O current.zip $url &&
