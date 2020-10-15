@@ -1,0 +1,75 @@
+---
+- name: "Insert env Hadoop - bashrc"
+  blockinfile:
+    path: "{{item}}"
+    create: yes
+    block: |
+      export JAVA_HOME="{{java_home}}"
+      export HADOOP_HOME="{{hadoop_home}}"
+      export HADOOP_MAPRED_HOME="{{hadoop_home}}"
+      export HADOOP_COMMON_HOME="{{hadoop_home}}"
+      export HADOOP_HDFS_HOME="{{hadoop_home}}"
+      export HADOOP_YARN_HOME="{{hadoop_home}}"
+      export PATH=/usr/local/bin/hadoop:/usr/local/sbin/hadoop:$PATH
+      export HADOOP_CONF_DIR="{{hadoop_home}}/etc/hadoop"
+      export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+  with_items:
+    - "/home/{{user_name}}/.bashrc"
+    - "/opt/.hadooprc"
+
+- name: "Add files template -  hadoop"
+  template:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+  with_items:
+    - { src: "hdfs-site.xml", dest: "{{hadoop_home}}/etc/hadoop/hdfs-site.xml" }
+    - { src: "core-site.xml", dest: "{{hadoop_home}}/etc/hadoop/core-site.xml" }
+    - { src: "hadoop-env.sh", dest: "{{hadoop_home}}/etc/hadoop/hadoop-env.sh" }
+    - { src: "yarn-env.sh", dest: "{{hadoop_home}}/etc/hadoop/yarn-env.sh" }
+    - { src: "mapred-site.xml", dest: "{{hadoop_home}}/etc/hadoop/mapred-site.xml"}
+    - { src: "yarn-site.xml", dest: "{{hadoop_home}}/etc/hadoop/yarn-site.xml" }
+    - { src: "masters", dest: "{{hadoop_home}}/etc/hadoop/masters" }
+    - { src: "slaves", dest: "{{hadoop_home}}/etc/hadoop/slaves" }
+    - { src: "workers", dest: "{{hadoop_home}}/etc/hadoop/workers" }
+
+- name: "Create a directory logs"
+  file:
+    path: "{{hadoop_home}}/logs"
+    state: "directory"
+
+- name: "Create a directory tmp"
+  file:
+    path: "{{ item }}"
+    state: "directory"
+  loop:
+    - "/tmp/hadoop-hadoop/dfs/namenode"
+    - "/tmp/hadoop-hadoop/dfs/name"
+    - "/tmp/hadoop-hadoop/"
+
+- name: "Change hadoop files permission"
+  file:
+    path: "{{item}}"
+    owner: "hadoop"
+    group: "hadoop"
+    recurse: yes
+  loop:
+    - "{{hadoop_home}}"
+    - "/tmp/hadoop-hadoop/"
+
+- name: "Add FQDN cluster - /etc/hosts "
+  lineinfile:
+    path: "/etc/hosts"
+    insertbefore: BOF
+    line: '{{ip_internal_master}} {{fqnd_cluster}}'
+
+- name: Create symbolic link - bin
+  file:
+    src: "{{hadoop_home}}/bin"
+    dest: "/usr/local/bin/hadoop"
+    state: link
+
+- name: Create symbolic link - sbin
+  file:
+    src: "{{hadoop_home}}/sbin"
+    dest: "/usr/local/sbin/hadoop"
+    state: link

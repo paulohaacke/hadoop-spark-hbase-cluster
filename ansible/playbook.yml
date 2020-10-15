@@ -1,0 +1,44 @@
+---
+- name: "Common requirements"
+  hosts: all
+  become: yes
+  roles:
+    - name: common
+  tags:
+    - common
+
+- name: "Provision Hadoop"
+  hosts: all
+  become: yes
+  vars:
+    ip_slaves: "{{ groups['gcp_hadoop_machine_type_worker'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+    ip_master: "{{ groups['gcp_hadoop_machine_type_manager'][0] }}"
+    ip_internal_master: "{{ hostvars[ip_master]['ansible_default_ipv4']['address']}}"
+  roles:
+    - name: hadoop
+  tags:
+    - hadoop
+      
+- name: "Provision Spark"
+  hosts: all
+  become: yes
+  vars:
+    ip_slaves: "{{ groups['gcp_hadoop_machine_type_worker'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+    ip_master: "{{ groups['gcp_hadoop_machine_type_manager'][0] }}"
+    ip_internal_master: "{{ hostvars[ip_master]['ansible_default_ipv4']['address']}}"
+  roles:
+    - name: spark
+  tags:
+    - spark
+    
+- name: "Provision HBase"
+  hosts: all
+  become: yes
+  vars:
+    ip_regionservers: "{{ groups['gcp_hadoop_machine_type_worker'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+    ip_master: "{{ groups['gcp_hadoop_machine_type_manager'][0] }}"
+    ip_internal_master: "{{ hostvars[ip_master]['ansible_default_ipv4']['address']}}"
+  roles:
+    - name: hbase
+  tags:
+    - hbase

@@ -1,0 +1,10 @@
+---
+plugin: google.cloud.gcp_compute
+projects:
+        - hdfs-tsd-testes
+auth_kind: serviceaccount
+filters: []
+service_account_file: /home/paulo/Documents/projects/mestrado/tsd/projeto-pratico/hdfs-tsd-testes-fa7ef1ffa61b.json
+keyed_groups:
+        - prefix: gcp
+          key: labels

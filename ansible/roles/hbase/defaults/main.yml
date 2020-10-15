@@ -1,0 +1,8 @@
+user_name: "hadoop"
+user_password: "hadoop"
+
+hbase_base: "/opt"
+hbase_home: "{{hbase_base}}/hbase-2.2.5"
+
+mirror_uri: "https://storage.googleapis.com/dados-tsd/hbase-2.2.5-bin.tar.gz"
+java_home: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"

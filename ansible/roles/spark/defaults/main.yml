@@ -1,0 +1,8 @@
+user_name: "hadoop"
+user_password: "hadoop"
+
+spark_base: "/opt"
+spark_home: "{{spark_base}}/spark-3.0.1-bin-hadoop3.2"
+
+mirror_uri: "https://downloads.apache.org/spark/spark-3.0.1/spark-3.0.1-bin-hadoop3.2.tgz"
+java_home: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"

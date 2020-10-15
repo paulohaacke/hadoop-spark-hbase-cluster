@@ -1,0 +1,51 @@
+- name: Download hbase
+  get_url: 
+    url: "{{mirror_uri}}"
+    dest: /tmp/
+    owner: "{{user_name}}"
+    group: "{{user_name}}"
+  register: download
+
+- name: Unpack hbase binaries
+  unarchive: 
+    src: "{{download.dest}}"
+    dest: "{{hbase_base}}"
+    owner: "{{user_name}}"
+    group: "{{user_name}}"
+    remote_src: yes
+
+- name: "Insert env HBase - bashrc"
+  blockinfile:
+    path: "{{item}}"
+    create: yes
+    block: |
+      export HBASE_HOME="{{hbase_home}}"
+      export PATH="$PATH:{{hbase_home}}/bin"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - HBASE"
+  with_items:
+    - "/home/{{user_name}}/.bashrc"
+    - "/opt/.hadooprc"
+  when: inventory_hostname == ip_master
+
+- name: Generate configuration files for hbase
+  template: 
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    owner: "{{user_name}}"
+    mode: 0644
+  with_items:
+    - { src: "regionservers.j2", dest: "{{hbase_home}}/conf/regionservers" }
+    - { src: "hbase-site.xml.j2", dest: "{{hbase_home}}/conf/hbase-site.xml" }
+    - { src: "hbase-env.sh.j2", dest: "{{hbase_home}}/conf/hbase-env.sh" }
+  
+- name: Start hbase
+  shell: 'source /opt/.hadooprc && start-hbase.sh'
+  args:
+    executable: /bin/bash
+  register: start_hbase_output
+  when: inventory_hostname == ip_master
+
+- name: Saída da inicialização do hbase
+  debug:
+    msg: "{{start_hbase_output.stdout}}"
+  when: inventory_hostname == ip_master

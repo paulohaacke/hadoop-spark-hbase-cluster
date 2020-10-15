@@ -1,0 +1,19 @@
+---
+- name: "User hadoop"
+  become: yes
+  import_tasks: "./user.yml"
+
+- name: "Pre install hadoop"
+  become: yes
+  import_tasks: "./pre-install.yml"
+
+- name: "Config hadoop"
+  become: yes
+  import_tasks: "./config.yml"
+  
+- name: "Start hadoop"
+  become: yes
+  become_user: "{{ user_name }}"
+  import_tasks: "./start.yml"
+  tags:
+    - start_hadoop

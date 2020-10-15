@@ -1,0 +1,27 @@
+- name: Format HDFS
+  shell: 'source /opt/.hadooprc && hdfs namenode -format -nonInteractive'
+  args:
+    executable: /bin/bash
+  when: inventory_hostname == ip_master
+  ignore_errors: true
+
+- name: Start HDFS
+  shell: 'source /opt/.hadooprc && start-dfs.sh'
+  args:
+    executable: /bin/bash
+  when: inventory_hostname == ip_master
+
+- name: Create HDFS home folder
+  shell: >
+    source /opt/.hadooprc && 
+    hdfs dfs -mkdir /user &&
+    hdfs dfs -mkdir /user/{{user_name}}
+  args:
+    executable: /bin/bash
+  when: inventory_hostname == ip_master
+
+- name: Start YARN
+  shell: 'source /opt/.hadooprc && start-yarn.sh'
+  args:
+    executable: /bin/bash
+  when: inventory_hostname == ip_master

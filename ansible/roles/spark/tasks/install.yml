@@ -1,0 +1,60 @@
+- name: Download spark
+  get_url: 
+    url: "{{mirror_uri}}"
+    dest: /tmp/
+  register: download
+  when: inventory_hostname == ip_master
+
+- name: Unpack spark source code
+  unarchive: 
+    src: "{{download.dest}}"
+    dest: "{{spark_base}}"
+    owner: "{{user_name}}"
+    group: "{{user_name}}"
+    remote_src: yes
+  when: inventory_hostname == ip_master
+
+- name: "Insert env Hadoop - bashrc"
+  blockinfile:
+    path: "{{item}}"
+    create: yes
+    block: |
+      export SPARK_HOME="{{spark_home}}"
+      export LD_LIBRARY_PATH="${HADOOP_HOME}/lib/native:$LD_LIBRARY_PATH"
+      export PATH="$PATH:{{spark_home}}/bin:{{spark_home}}/sbin"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - SPARK"
+  with_items:
+    - "/home/{{user_name}}/.bashrc"
+    - "/opt/.hadooprc"
+  when: inventory_hostname == ip_master
+
+- name: Refresh .bashrc
+  shell: source /home/{{user_name}}/.bashrc
+  args: 
+    executable: /bin/bash
+  when: inventory_hostname == ip_master
+
+- name: Generate spark-defaults.conf for spark
+  template: 
+    src: spark-defaults.conf.j2 
+    dest: "{{spark_home}}/conf/spark-defaults.conf"
+    owner: "{{user_name}}"
+    mode: 0644
+  when: inventory_hostname == ip_master
+    
+- name: Create spark-logs folder
+  shell: "source /opt/.hadooprc && hdfs dfs -mkdir /spark-logs"
+  args:
+    executable: /bin/bash
+  when: inventory_hostname == ip_master
+  ignore_errors: true
+  become: yes
+  become_user: "{{ user_name }}"
+  
+- name: Start History Server
+  shell: 'source /opt/.hadooprc && {{spark_home}}/sbin/start-history-server.sh'
+  args:
+    executable: /bin/bash
+  when: inventory_hostname == ip_master
+  become: yes
+  become_user: "{{ user_name }}"

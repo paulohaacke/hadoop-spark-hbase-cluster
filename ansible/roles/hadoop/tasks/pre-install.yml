@@ -1,0 +1,7 @@
+- name: "Get files - Hadoop version 3.2.1"
+  unarchive:
+    src: "{{mirror_uri_ftp}}"
+    dest: "{{hadoop_base}}"
+    owner: "{{user_name}}"
+    group: "{{user_name}}"
+    remote_src: yes

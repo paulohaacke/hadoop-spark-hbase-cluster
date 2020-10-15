@@ -1,0 +1,4 @@
+- name: "Install HBase"
+  import_tasks: install.yml
+  become: yes
+  become_user: "{{ user_name }}"

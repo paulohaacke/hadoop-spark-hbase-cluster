@@ -1,0 +1,13 @@
+user_name: "hadoop"
+user_password: "hadoop"
+
+fqnd_cluster: "hadoop"
+
+hadoop_base: "/opt"
+hadoop_home: "{{hadoop_base}}/hadoop-3.2.1"
+
+mirror_uri_ftp: "https://downloads.apache.org/hadoop/common/hadoop-3.2.1/hadoop-3.2.1.tar.gz"
+java_home: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+
+
+hdfs_replication: 1
