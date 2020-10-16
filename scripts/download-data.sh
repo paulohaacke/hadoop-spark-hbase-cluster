@@ -16,6 +16,6 @@ do
 		wget -O current.zip $url &&
 		unzip current.zip &&
 		hdfs dfs -put ./*.csv /input/ &&
-		rm ./*.zip && mv ./*.csv /uploaded
+		rm ./*.zip && mv ./*.csv ./uploaded/
 done
 
